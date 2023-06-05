@@ -11,14 +11,14 @@ Feature: Testing a Task REST API
     Given valid task ID
     When GET request is sent to the task REST API with the ID
     Then API responds with a HTTP 200 status code
-    And returns the JSON object for the specified task
+    And returns JSON object for the specified ID
 
   Scenario: Adding a new task using the REST API
     Given new task with a unique ID and all required fields
     When POST request is sent to the task REST API with the task details
     Then API responds with a HTTP 201 status code
     And task is added to the database
-    And returns the JSON object for the specified task
+    And returns the JSON object for the new task
 
   Scenario: Updating an existing task using the REST API
     Given existing task with a valid ID and updated fields

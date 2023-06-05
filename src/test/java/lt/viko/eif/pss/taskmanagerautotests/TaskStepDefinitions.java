@@ -44,22 +44,29 @@ public class TaskStepDefinitions {
         List<Map<String, String>> taskList = JsonPath.read(jsonString, "$._embedded.taskList");
         Assert.assertTrue(taskList.size() > 0);
 
-
-        taskId = String.valueOf(taskList.get(0).get("id"));
+/*        taskId = String.valueOf(taskList.get(0).get("id"));*/
     }
 
     @Given("valid task ID")
     public void validTaskId() {
-        System.out.println("Hello World");
+        taskId = "1";
     }
 
     @When("GET request is sent to the task REST API with the ID")
     public void getRequestsSentWithTheId() {
+        RequestSpecification request = RestAssured.given();
+        response = request.get("/api/tasks/" + taskId);
+    }
+
+    @And("returns JSON object for the specified ID")
+    public void returnsJsonObjectForTheSpecifiedId() {
+        jsonString = response.asString();
+        String taskName = JsonPath.read(jsonString, "name");
+        Assert.assertNotEquals("Task name should not be empty",taskName, "");
     }
 
     @Given("new task with a unique ID and all required fields")
     public void newTaskWithAUniqueIdAndAllRequiredFields() {
-        System.out.println("Hello World");
     }
 
     @When("POST request is sent to the task REST API with the task details")
@@ -76,7 +83,6 @@ public class TaskStepDefinitions {
 
     @Given("existing task with a valid ID and updated fields")
     public void existingTaskWithAValidIdAndUpdatedFields() {
-        System.out.println("Hello World");
     }
     @When("PUT request is sent to the task REST API with the updated task details")
     public void putRequestsSentWithTheUpdatedTaskDetails() {
@@ -92,7 +98,6 @@ public class TaskStepDefinitions {
 
     @Given("existing task with a valid ID")
     public void existingTaskWithAValidId() {
-        System.out.println("Hello World");
     }
 
     @When("DELETE request is sent to the task REST API with the ID")
@@ -109,5 +114,9 @@ public class TaskStepDefinitions {
 
     @And("JSON object is returned by the API")
     public void jsonObjectIsReturnedByTheApi() {
+    }
+
+    @And("returns the JSON object for the new task")
+    public void returnsTheJSONObjectForTheNewTask() {
     }
 }
