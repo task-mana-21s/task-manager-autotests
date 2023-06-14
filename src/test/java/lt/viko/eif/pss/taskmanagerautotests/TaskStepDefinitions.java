@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -65,58 +66,57 @@ public class TaskStepDefinitions {
         Assert.assertNotEquals("Task name should not be empty",taskName, "");
     }
 
-    @Given("new task with a unique ID and all required fields")
-    public void newTaskWithAUniqueIdAndAllRequiredFields() {
-    }
-
-    @When("POST request is sent to the task REST API with the task details")
+    @Given("POST request is sent to the task REST API with the task details")
     public void postRequestsSentWithTheTaskDetails() {
+        RestAssured.baseURI = BASE_URL;
+        RequestSpecification request = RestAssured.given();
+        request.header("Content-Type", "application/json");
+
+        response = request.body("{" +
+                        "  \"name\": \"Post Test\"," +
+                        "  \"description\": \"Test description\"" +
+                        "}")
+                .post("/api/tasks");
     }
 
-    @Then("API responds with a HTTP 201 status code")
+    @When("API responds with a HTTP 201 status code")
     public void apiRespondsWithAHttp201StatusCode() {
+        Assert.assertEquals(201, response.getStatusCode());
     }
 
-    @And("task is added to the database")
-    public void taskIsAddedToTheDatabase() {
-    }
-
-    @Given("existing task with a valid ID and updated fields")
-    public void existingTaskWithAValidIdAndUpdatedFields() {
-    }
     @When("PUT request is sent to the task REST API with the updated task details")
     public void putRequestsSentWithTheUpdatedTaskDetails() {
-    }
+        RestAssured.baseURI = BASE_URL;
+        RequestSpecification request = RestAssured.given();
+        request.header("Content-Type", "application/json");
 
-    @And("task is updated in the database")
-    public void taskIsUpdatedInTheDatabase() {
+        response = request.body("{" +
+                        "  \"name\": \"Put Test\"," +
+                        "  \"description\": \"Test description\"" +
+                        "}")
+                .put("/api/tasks/1");
     }
 
     @And("returns the JSON object for the updated task")
     public void returnsTheJsonObjectForTheUpdatedTask() {
-    }
-
-    @Given("existing task with a valid ID")
-    public void existingTaskWithAValidId() {
+        jsonString = response.asString();
+        String taskName = JsonPath.read(jsonString, "name");
+        Assert.assertEquals("Updated task name should match",taskName, "Put Test");
     }
 
     @When("DELETE request is sent to the task REST API with the ID")
     public void deleteRequestsSentWithTheId() {
+        RestAssured.baseURI = BASE_URL;
+        RequestSpecification request = RestAssured.given();
+        response = request.delete("/api/tasks/2");
     }
 
-    @Then("API responds with a HTTP 204 status code")
-    public void apiRespondsWithAHttp204StatusCode() {
-    }
 
-    @And("task is deleted from the database")
-    public void taskIsDeletedFromTheDatabase() {
-    }
-
-    @And("JSON object is returned by the API")
-    public void jsonObjectIsReturnedByTheApi() {
-    }
-
-    @And("returns the JSON object for the new task")
+    @Then("returns the JSON object for the new task")
     public void returnsTheJSONObjectForTheNewTask() {
+        jsonString = response.asString();
+        String taskName = JsonPath.read(jsonString, "name");
+        Assert.assertEquals("Task name should match",taskName, "Post Test");
     }
+
 }
